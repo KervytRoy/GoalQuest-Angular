@@ -1,0 +1,15 @@
+<h2 mat-dialog-title>{{data ? 'Update Activity' : 'Create Activity'}}</h2>
+<mat-dialog-content>
+  <form [formGroup]="activityForm" (ngSubmit)="onSubmit()">
+    <mat-form-field>
+      <mat-label>Nombre</mat-label>
+      <input matInput formControlName="name">
+      <mat-error *ngIf="activityForm.get('name')?.invalid">Name is Required and must have 80 characters</mat-error>
+    </mat-form-field>
+
+    <mat-dialog-actions>
+      <button mat-button mat-dialog-close>Cancelar</button>
+      <button mat-button type="submit" [disabled]="activityForm.invalid">{{data ? 'Update' : 'Create'}}</button>
+    </mat-dialog-actions>
+  </form>
+</mat-dialog-content>

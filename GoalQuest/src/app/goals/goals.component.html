@@ -1,0 +1,109 @@
+<div style="display: flex; height:70px">
+  <mat-card class="goal-control-card">
+    <mat-card-header style="display: flex; justify-content: space-between; align-items: center;">
+      <mat-card-title>Goals Control</mat-card-title>
+      <button mat-mini-fab color="primary" matTooltip="Add Goal" (click)="createGoal()">
+        <mat-icon>add</mat-icon>
+      </button>
+    </mat-card-header>
+  </mat-card>
+  <mat-card class="manage-goal-activities-card">
+    <mat-card-header style=" padding-top: 20px;">
+      <mat-card-title>Manage Goal Activities</mat-card-title>
+    </mat-card-header>
+  </mat-card>
+</div>
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav #drawer mode="side" opened style="width: 25%;">
+    <mat-card *ngFor="let goal of goalList" class="sidebar-card">
+      <mat-card-header style="display:block !important;">
+        <div class="card-title-buttons">
+          <mat-card-title>{{goal.name}}</mat-card-title>
+          <div class="card-buttons">
+            <button mat-mini-fab style="margin: 2%;" (click)="goal.id !== undefined ? viewActivities(goal.id,1) : undefined" color="accent" matTooltip="View Goal Activities"><mat-icon>visibility</mat-icon></button>
+            <button mat-mini-fab style="margin: 2%;" (click)="updateGoal(goal)" color="primary" matTooltip="Edit"><mat-icon>edit</mat-icon></button>
+            <button mat-mini-fab style="margin: 2%;" (click)="goal.id !== undefined ? deleteGoal(goal.id) : undefined" color="warn" matTooltip="Delete"><mat-icon>delete</mat-icon></button>
+          </div>
+        </div>
+        <div class="card-date">{{goal.createdDate | date:'shortDate'}}</div>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="task-info">
+          <p>Completed Tasks: {{getCompletedTasks(goal)}}/{{getTotalTasks(goal)}}</p>
+          <mat-progress-bar mode="determinate" [value]="getProgress(goal)"></mat-progress-bar>
+          <p>**{{getProgress(goal)}}%**</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </mat-sidenav>
+  <mat-sidenav-content style="padding: 3%; background-color: lightgray">
+    <ng-container *ngIf="selectedGoal; else showMessage">
+      <div class="buttons-container">
+        <button style="margin: 1%" mat-mini-fab color="primary" matTooltip="Add Activity" (click)="createActivity()">
+          <mat-icon>add</mat-icon>
+        </button>
+        <button style="margin: 1%" mat-mini-fab color="primary" matTooltip="Complete Activities" (click)="completeActivities()">
+          <mat-icon>done_all</mat-icon>
+        </button>
+        <button mat-mini-fab style="margin: 1%" color="primary" matTooltip="Delete Activities" (click)="deleteActivities()">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+
+      <table mat-table [dataSource]="dataSource">
+        <ng-container matColumnDef="selected">
+          <th mat-header-cell *matHeaderCellDef>
+            <mat-checkbox (change)="selectAll($event)">All</mat-checkbox>
+          </th>
+          <td mat-cell *matCellDef="let element">
+            <mat-checkbox [(ngModel)]="element.selected"></mat-checkbox>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef> Name </th>
+          <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+        </ng-container>
+        <ng-container matColumnDef="createdDate">
+          <th mat-header-cell *matHeaderCellDef> Created Date </th>
+          <td mat-cell *matCellDef="let element"> {{ element.createdDate | date: 'shortDate' }} </td>
+        </ng-container>
+        <ng-container matColumnDef="important">
+          <th mat-header-cell *matHeaderCellDef> Important </th>
+          <td mat-cell *matCellDef="let element">
+            <mat-checkbox [(ngModel)]="element.important" (change)="handleImportantChange(element)">
+            </mat-checkbox>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef> Status </th>
+          <td mat-cell *matCellDef="let element"> {{element.status === 1 ? "Open": "Completed"}} </td>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef> Actions </th>
+          <td mat-cell *matCellDef="let element">
+            <button mat-icon-button (click)="updateActivity(element)">
+              <mat-icon>edit</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+
+      <div class="paginator-container">
+        <button mat-button (click)="previousPage()" [disabled]="pageIndex === 0">Anterior</button>
+        <span>Página {{ pageIndex + 1 }} de {{ totalRecords }}</span>
+        <button mat-button (click)="nextPage()" [disabled]="pageIndex === totalRecords - 1">Siguiente</button>
+      </div>
+    </ng-container>
+
+    <ng-template #showMessage>
+      <div class="centered-chip">
+        <mat-chip color="primary">
+          <mat-icon>info</mat-icon>
+          <span>View Goal Activities</span>
+        </mat-chip>
+      </div>
+    </ng-template>  </mat-sidenav-content>
+
+</mat-sidenav-container>
